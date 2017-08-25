@@ -1,6 +1,9 @@
 from track import Track
 
 
+def offer_value(track: Track):
+    pass
+
 def length_inverse(track: Track):
     ret = 1 / track.length()
     return ret

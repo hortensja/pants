@@ -22,7 +22,7 @@ class BoundingBox:
         return "lat: " + str(self.lats) + ", lng: " + str(self.lngs)
 
 
-class GeoCoords():
+class GeoCoords:
     def __init__(self, lat, lng, reverse=False):
         if reverse:
             lat, lng = lng, lat
@@ -48,7 +48,7 @@ class GeoCoords():
 class GeoDecoder:
     def __init__(self):
         self.geolocator = ggc.Nominatim()
-        self.gmaps = googlemaps.Client(key='KLUCZ_GUGLA_TY_GUPKU')
+        self.gmaps = None # googlemaps.Client(key='KLUCZ_GUGLA_TY_GUPKU')
 
     def decode(self, coords: GeoCoords):
         location = self.geolocator.reverse(str(coords))
@@ -59,11 +59,20 @@ class GeoDecoder:
                                      mode="driving",
                                      departure_time=time)
 
-    def get_naive_distance(self, city1, city2):
+    def get_city_default(self, gc: GeoCoords):
+        geo_json = self.decode(gc).raw
+        return GeoExtractor.extract_city(geo_json).strip()
+
+    @staticmethod
+    def get_naive_distance_from_nodes(city1, city2):
+        return GeoDecoder.get_naive_distance(city1.center, city2.center)
+
+    @staticmethod
+    def get_naive_distance(gc1, gc2):
         try:
-            return gdst.distance(str(city1.center), str(city2.center))
+            return gdst.distance(str(gc1), str(gc2))
         except:
-            return FileNotFoundError
+            return KeyError
 
 
 class GeoExtractor:

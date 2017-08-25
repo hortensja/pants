@@ -8,7 +8,7 @@ from geocoding import BoundingBox, GeoCoords
 
 
 class Node:
-    def __init__(self, bb: BoundingBox, center: GeoCoords, name=None, coords=None):
+    def __init__(self, bb: BoundingBox, center: GeoCoords, name=None, coords=None, duplicates=0):
         if name is not None:
             self.name = name
         else:
@@ -20,6 +20,7 @@ class Node:
             self.records = [center]
         self.recalc_center()
         self.edges = set()
+        self.duplicate = duplicates
 
     def add_record(self, gc: GeoCoords):
         self.records.append(gc)
@@ -28,9 +29,9 @@ class Node:
     def push_edge(self, other_node, length):
         self.edges.append(Edge(other_node, length, self))
 
-    def push_sym_edge(self, other_node, length):
-        one = Edge(other_node, length)
-        other = Edge(self, length)
+    def push_sym_edge(self, other_node, length, real=False):
+        one = Edge(other_node, length, real)
+        other = Edge(self, length, real)
 
         one.opt_reverse = other
         other.opt_reverse = one
@@ -48,15 +49,25 @@ class Node:
         self.center = ret
         return ret
 
+    def contains_coords(self, gc: GeoCoords):
+        return gc.is_in_bounding_box(self.bounding_box)
+
+    def short_str(self):
+        ret = '\n'
+        ret += self.name + ' bb: [' + str(self.bounding_box) + '] center: (' + str(self.center) + ') qty: ' + str(len(self.records) + self.duplicate)
+        ret += '\n'
+        return ret
+
     def __eq__(self, other):
         if self.name == other.name:
             return True
         return False
 
+    def __hash__(self):
+        return hash(self.name)
+
     def __str__(self):
-        ret = '\n'
-        ret += self.name + ' bb: [' + str(self.bounding_box) + '] center: (' + str(self.center) + ') qty: ' + str(len(self.records))
-        ret += '\n'
+        ret = self.short_str()
         for edge in self.edges:
             ret += '\t'
             ret += str(edge)

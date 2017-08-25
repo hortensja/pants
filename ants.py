@@ -7,7 +7,7 @@ from track import Track
 
 class AntEdge(Edge):
     def __init__(self, edge):
-        super().__init__(edge.node, edge.length)
+        super().__init__(edge.node, edge.length, edge.real)
         edge.pheromone = 1
 
     @staticmethod
@@ -79,11 +79,11 @@ class ArtificialAnts(Algorithm):
 
         for ant in ants:
             score = self.evaluate(ant.track)
-            scores.append(ant.track.length())
+            scores.append(score)
 
             for edge in ant.track.edges:
-                edge.pheromone += score
-                edge.opt_reverse.pheromone += score
+                edge.pheromone += max(score,0)
+                edge.opt_reverse.pheromone += max(score,0)
 
         self.evaporate()
         self.normalize()

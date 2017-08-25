@@ -31,3 +31,9 @@ class Track:
             total += edge.length
 
         return total
+
+    def __str__(self):
+        ret = self.start.name
+        ret += " "
+        ret += " ".join(map(lambda x: x.node.name, self.edges))
+        return ret

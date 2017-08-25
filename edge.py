@@ -1,12 +1,14 @@
 class Edge:
-    def __init__(self, node, length, opt_reverse = None):
+    def __init__(self, node, length, opt_reverse=None, real=False):
         self.node = node
         self.length = length
         self.opt_reverse = opt_reverse
+        self.real = real
 
     def __str__(self):
         ret = "--- "
-        ret += str(self.length)
+        ret += str(round(self.length, 2))
+        ret += ' (real) ' if self.real else ''  # ' (appr) '
         ret += " ---> "
         ret += self.node.name
         return ret

@@ -59,3 +59,6 @@ class Algorithm:
         self.avg.append(avg)
         self.max.append(best)
         self.min.append(worst)
+
+    def print_score(self):
+        print('avg:', self.avg, 'min:',self.min, 'max:',self.max)
