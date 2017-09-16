@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import googlemaps
+# import googlemaps
 from geopy import geocoders as ggc, distance as gdst
 
 

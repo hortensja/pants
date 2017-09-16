@@ -35,7 +35,7 @@ def estimate_offer(offer, price_lookup):
 
 
 def gupia_function(truX, truY, X, Y):
-    print(X.shape)
+    #print(X.shape)
     dupa = np.multiply.reduce(X.shape)
     X = X.reshape(dupa)
     Y = Y.reshape(np.multiply.reduce(Y.shape))
@@ -86,7 +86,7 @@ class OfferEstimate:
 
 
 if __name__ == "__main__":
-    print("kupa")
+    #print("kupa")
 
     # Sample data
     side = np.linspace(-2, 2, 10)
@@ -134,6 +134,6 @@ class OfferEvalutaor:
                 offer_list.remove(bad_offer)
             # for chosen_one in chosen_ones:
                 # print(chosen_one)
-            revenue_list.append(OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.01 + (revenue_list[-1] if len(revenue_list) > 0 else 0))
-        print(max(revenue_list), str(track))
-        return max(revenue_list)
+            revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.01 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge))
+        print(max(revenue_list, key=lambda x: x[0])[0], str(track))
+        return max(revenue_list, key=lambda x: x[0])

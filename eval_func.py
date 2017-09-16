@@ -6,7 +6,7 @@ def offer_value(track: Track):
 
 def length_inverse(track: Track):
     ret = 1 / track.length()
-    return ret
+    return ret, None
 
 def length_inverse_squared(track: Track):
-    return 1 / (track.length()**2)
+    return 1 / (track.length()**2), None

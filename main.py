@@ -190,10 +190,10 @@ if __name__ == "__main__":
 
     offer_evaluator = OfferEvalutaor(offer_list)
 
-    ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=100)
+    ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
 
     ants.run()
-    print(graph)
+    #print(graph)
 
     ants.print_score()
 

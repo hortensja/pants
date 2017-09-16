@@ -78,15 +78,20 @@ class ArtificialAnts(Algorithm):
             ant.walk(self.graph)
 
         for ant in ants:
-            score = self.evaluate(ant.track)
+            score, endpoint = self.evaluate(ant.track)
+            #print(str(ant), score)
             scores.append(score)
 
             for edge in ant.track.edges:
                 edge.pheromone += max(score,0)
-                edge.opt_reverse.pheromone += max(score,0)
+                # edge.opt_reverse.pheromone += max(score,0)
+                #print(edge)
+                if edge == endpoint:
+                    break
 
         self.evaporate()
         self.normalize()
+        #print(self.graph)
         self.score(scores)
 
     def normalize(self):
