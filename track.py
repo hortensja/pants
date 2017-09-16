@@ -1,3 +1,4 @@
+from __future__ import *
 class Track:
     def __init__(self, start):
         self.edges = []
