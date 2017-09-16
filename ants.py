@@ -1,3 +1,4 @@
+from __future__ import *
 from random import random
 
 from alg import Algorithm
