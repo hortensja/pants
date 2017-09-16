@@ -1,3 +1,4 @@
+from __future__ import *
 from track import Track
 
 
