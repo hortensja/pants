@@ -1,3 +1,4 @@
+from __future__ import *
 import pickle
 
 
@@ -31,7 +32,7 @@ class PriceLookup:
     def __init__(self):
         self.prices = {}
 
-    def add_price(self, price_info: PriceInfo):
+    def add_price(self, price_info):
         start = price_info.start
         try:
             self.prices[start].append(price_info)
