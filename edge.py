@@ -1,3 +1,4 @@
+from __future__ import *
 class Edge:
     def __init__(self, node, length, opt_reverse=None, real=False):
         self.node = node
