@@ -1,5 +1,5 @@
 import time
-
+from __future__ import *
 from track import Track
 
 
@@ -41,7 +41,7 @@ class Algorithm:
                 if self.it >= self.iterations:
                     break
 
-    def evaluate(self, track: Track):
+    def evaluate(self, track):
         return self.evaluation_function(track)
 
     def score(self, scores):
