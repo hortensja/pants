@@ -59,7 +59,7 @@ def create_real_graph(lookup_file=None):
         lng.append(gc.lng)
         name = u'dupa'
         try:
-            match = n for n in node_list if n.contains_coords(gc).next()
+            match = [n for n in node_list if n.contains_coords(gc).next()]
             match.add_record(gc)
             name = match.name
             print u'Found ', match.short_str(), u'in existing records'

@@ -2,10 +2,8 @@ from __future__ import absolute_import
 from math import sin, cos, sqrt
 import pylab as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 
 from geocoding import GeoDecoder, GeoCoords
-from track import Track
 from itertools import imap
 
 NUMBER_OF_NEIGHBORS = 5
