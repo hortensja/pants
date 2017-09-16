@@ -1,3 +1,4 @@
+from __future__ import *
 from functools import reduce
 from math import sin, cos, sqrt
 import pylab as plt
