@@ -1,5 +1,5 @@
 import csv
-
+from __future__ import *
 
 def get_freights():
     with open('resources/freights_test.csv') as freights:
