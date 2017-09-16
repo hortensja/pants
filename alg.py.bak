@@ -1,10 +1,9 @@
-from __future__ import absolute_import
 import time
 
 from track import Track
 
 
-class Algorithm(object):
+class Algorithm:
     def __init__(self, function, iterations=None, seconds=None):
         self.evaluation_function = function
 
@@ -42,13 +41,13 @@ class Algorithm(object):
                 if self.it >= self.iterations:
                     break
 
-    def evaluate(self, track):
+    def evaluate(self, track: Track):
         return self.evaluation_function(track)
 
     def score(self, scores):
         avg = 0
-        best = float(u'inf')
-        worst = -float(u'inf')
+        best = float('inf')
+        worst = -float('inf')
 
         for score in scores:
             avg += score
@@ -62,4 +61,4 @@ class Algorithm(object):
         self.min.append(worst)
 
     def print_score(self):
-        print u'avg:', self.avg, u'min:',self.min, u'max:',self.max
+        print('avg:', self.avg, 'min:',self.min, 'max:',self.max)

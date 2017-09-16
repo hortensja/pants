@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from functools import reduce
 from math import sin, cos, sqrt
 import pylab as plt
 import numpy as np
@@ -6,7 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from geocoding import GeoDecoder, GeoCoords
 from track import Track
-from itertools import imap
 
 NUMBER_OF_NEIGHBORS = 5
 
@@ -36,7 +35,7 @@ def estimate_offer(offer, price_lookup):
 
 
 def gupia_function(truX, truY, X, Y):
-    print X.shape
+    print(X.shape)
     dupa = np.multiply.reduce(X.shape)
     X = X.reshape(dupa)
     Y = Y.reshape(np.multiply.reduce(Y.shape))
@@ -44,7 +43,7 @@ def gupia_function(truX, truY, X, Y):
     truY = truY.reshape(np.multiply.reduce(truY.shape))
     trutruXY = np.array((truX, truY)).T
     eror_table = []
-    for i in xrange(dupa):
+    for i in range(dupa):
         x, y = X[i], Y[i]
         xy = (x, y)
         trutruXY = sorted(trutruXY, key=lambda p: dystance(xy, p))
@@ -53,11 +52,11 @@ def gupia_function(truX, truY, X, Y):
         eror = abs(meaningless - wtf_function(x, y))
         eror_table.append(eror)
         # return 69
-    print np.mean(eror_table)
+    print(np.mean(eror_table))
     return np.array(eror_table).reshape((10, 10))
 
 
-class OfferEstimate(object):
+class OfferEstimate:
     def __init__(self, start, end, price_per_km, length=None):
         self.start = start
         self.end = end
@@ -73,21 +72,21 @@ class OfferEstimate(object):
         self.total = self.price_per_km * self.length
 
     def __str__(self):
-        ret = u'Offer '
+        ret = 'Offer '
         ret += self.start
-        ret += u'-'
+        ret += '-'
         ret += self.end
-        ret += u': '
-        ret += unicode(round(self.price_per_km, 2))
-        ret += u'*'
-        ret += unicode(round(self.length,1))
-        ret += u'='
-        ret += unicode(round(self.total, 2))
+        ret += ': '
+        ret += str(round(self.price_per_km, 2))
+        ret += '*'
+        ret += str(round(self.length,1))
+        ret += '='
+        ret += str(round(self.total, 2))
         return ret
 
 
-if __name__ == u"__main__":
-    print u"kupa"
+if __name__ == "__main__":
+    print("kupa")
 
     # Sample data
     side = np.linspace(-2, 2, 10)
@@ -101,22 +100,22 @@ if __name__ == u"__main__":
     # # print(Z)
     # # Plot the density map using nearest-neighbor interpolation
     #
-    fig = plt.figure(facecolor=u'k')
-    ax = fig.add_subplot(111, projection=u'3d')
+    fig = plt.figure(facecolor='k')
+    ax = fig.add_subplot(111, projection='3d')
 
     ax.plot_wireframe(X=X, Y=Y, Z=Z)
     plt.show()
 
-class OfferEvalutaor(object):
+class OfferEvalutaor:
     def __init__(self, offer_list):
         self.offer_list = offer_list
-        u'zesraj sie'
+        'zesraj sie'
 
     @staticmethod
     def calculate_revenue(chosen_ones):
-        return sum(imap(lambda x: x.total, chosen_ones))
+        return sum(map(lambda x: x.total, chosen_ones))
 
-    def __call__(self, track):
+    def __call__(self, track: Track):
         revenue_list = []
         visited = set()
         visited.add(track.start.name)
@@ -136,5 +135,5 @@ class OfferEvalutaor(object):
             # for chosen_one in chosen_ones:
                 # print(chosen_one)
             revenue_list.append(OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.01 + (revenue_list[-1] if len(revenue_list) > 0 else 0))
-        print max(revenue_list), unicode(track)
+        print(max(revenue_list), str(track))
         return max(revenue_list)
