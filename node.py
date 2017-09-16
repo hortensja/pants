@@ -1,4 +1,5 @@
 import uuid
+from __future__ import *
 
 from edge import Edge
 from geocoding import BoundingBox, GeoCoords
@@ -8,7 +9,7 @@ from geocoding import BoundingBox, GeoCoords
 
 
 class Node:
-    def __init__(self, bb: BoundingBox, center: GeoCoords, name=None, coords=None, duplicates=0):
+    def __init__(self, bb, center, name=None, coords=None, duplicates=0):
         if name is not None:
             self.name = name
         else:
@@ -22,7 +23,7 @@ class Node:
         self.edges = set()
         self.duplicate = duplicates
 
-    def add_record(self, gc: GeoCoords):
+    def add_record(self, gc):
         self.records.append(gc)
         self.recalc_center()
 
@@ -49,7 +50,7 @@ class Node:
         self.center = ret
         return ret
 
-    def contains_coords(self, gc: GeoCoords):
+    def contains_coords(self, gc):
         return gc.is_in_bounding_box(self.bounding_box)
 
     def short_str(self):
