@@ -193,23 +193,23 @@ if __name__ == "__main__":
     ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
 
     ants.run()
-    #print(graph)
+    # print(graph)
 
-    ants.print_score()
+    # ants.print_score()
 
     path = graph.get_path_default()
 
-    for i, path_node in enumerate(path):
-        print(i, path_node.name)
+    # for i, path_node in enumerate(path):
+    #     print(i, path_node.name)
 
     visited = set()
     revenue_list = []
 
 
 
-    print('potential revenue:')
-    for revue in revenue_list:
-        print(revue)
+    # print('potential revenue:')
+    # for revue in revenue_list:
+    #     print(revue)
 
         # print(graph)
         #

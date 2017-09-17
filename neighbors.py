@@ -1,8 +1,5 @@
-from functools import reduce
-from math import sin, cos, sqrt
-import pylab as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
+import pylab as plt
 
 from geocoding import GeoDecoder, GeoCoords
 from track import Track
@@ -23,7 +20,7 @@ def estimate_offer(offer, price_lookup):
     offer_start_gc = GeoCoords(offer[3], offer[4])
     offer_end_gc = GeoCoords(offer[5], offer[6])
     price_info_list = [price_info[1] for price_info in price_lookup.prices.items()]
-    sorted_lookup = sorted(price_info_list, key=lambda price: base_distance(offer_start_gc, price[0].start.center))
+    sorted_lookup = sorted(price_info_list, key=lambda price: base_distance(offer_start_gc, price[0].start.center) + base_distance(offer_end_gc, price[0].end.center))
     best_neighbors = [neighbor[0].calculate_price()[0] for neighbor in sorted_lookup][:NUMBER_OF_NEIGHBORS]
 
     mean = np.mean(best_neighbors)
@@ -110,6 +107,8 @@ class OfferEvalutaor:
     def __init__(self, offer_list):
         self.offer_list = offer_list
         'zesraj sie'
+        'DUPA'
+        'smierdzisz'
 
     @staticmethod
     def calculate_revenue(chosen_ones):
@@ -134,6 +133,6 @@ class OfferEvalutaor:
                 offer_list.remove(bad_offer)
             # for chosen_one in chosen_ones:
                 # print(chosen_one)
-            revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.01 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge))
-        print(max(revenue_list, key=lambda x: x[0])[0], str(track))
+            revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.4 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge))
+        #print(max(revenue_list, key=lambda x: x[0])[0], str(track))
         return max(revenue_list, key=lambda x: x[0])

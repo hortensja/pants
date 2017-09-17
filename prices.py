@@ -2,7 +2,7 @@ import pickle
 
 
 class PriceInfo:
-    def __init__(self, start, end, empty_dist=0, loaded_dist=0, price=0, length=0):
+    def __init__(self, start, end, empty_dist=0, loaded_dist=0, price=0):
         self.start = start
         self.end = end
         self.empty_dist = float(empty_dist)
