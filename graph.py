@@ -1,15 +1,18 @@
+from __future__ import with_statement
+from __future__ import absolute_import
 from collections import defaultdict
 
 import pickle
 
 from geocoding import GeoDecoder
 from node import Node
+from io import open
 
 
 THRESHOLD_DISTANCE = 10000
 TOLERABLE_DISTANCE = 20
 
-class Graph:
+class Graph(object):
     def __init__(self):
         self.nodes = []
         self.nodes_dict = dict()
@@ -21,7 +24,7 @@ class Graph:
 
     def add_node(self, node):
         if node.name in self.nodes_dict:
-            raise KeyError("Takie miasto juz istnieje")
+            raise KeyError(u"Takie miasto juz istnieje")
 
         self.nodes.append(node)
         self.nodes_dict[node.name] = node
@@ -38,8 +41,8 @@ class Graph:
                     try:
                         distance = decoder.get_driving_distance(node, another)
                         real = True
-                    except BaseException as e:
-                        print(e)
+                    except BaseException, e:
+                        print e
                         pass
                 node.push_sym_edge(another, distance, real)
 
@@ -59,12 +62,12 @@ class Graph:
     def save(self, where):
         nodes_to_save = list((node.bounding_box, node.records, node.name, node.duplicate) for node in self.nodes)
         edges_to_save = list((node.name, edge.node.name, edge.length, edge.real) for node in self.nodes for edge in node.edges)
-        with open(where, "wb") as f:
+        with open(where, u"wb") as f:
             pickle.dump((nodes_to_save, edges_to_save), f)
 
     @staticmethod
     def load(where):
-        with open(where, "rb") as f:
+        with open(where, u"rb") as f:
             nodes, edges = pickle.load(f)
             ret = Graph()
             for bb, coords, node, duplicate in nodes:
@@ -79,9 +82,9 @@ class Graph:
             return ret
 
     def __str__(self):
-        ret = ""
+        ret = u""
         for node in self.nodes:
-            ret += str(node)
+            ret += unicode(node)
         return ret
 
     def match_duplicates(self, name, gc):
@@ -89,7 +92,7 @@ class Graph:
             alleged_match = self.get_nodes_by_name(name)
             alleged_distance = GeoDecoder.get_naive_distance(gc, alleged_match.center).kilometers
             if alleged_distance < TOLERABLE_DISTANCE:
-                print(name, ' already exists in graph: ', alleged_match.short_str())
+                print name, u' already exists in graph: ', alleged_match.short_str()
                 alleged_match.duplicate += 1
                 raise StopIteration
         except KeyError:

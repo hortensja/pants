@@ -1,3 +1,5 @@
+from __future__ import with_statement
+from __future__ import absolute_import
 import random
 
 import pickle
@@ -14,11 +16,12 @@ from matplotlib import *
 from matplotlib.pyplot import *
 
 from prices import PriceInfo, PriceLookup
+from io import open
 
 
 def create_random_graph():
     graph = Graph()
-    for i in range(10):
+    for i in xrange(10):
         node = graph.create_node(name=None)
         for another in graph.nodes:
             if node != another:
@@ -29,13 +32,13 @@ def create_random_graph():
 
 def create_malbork_graph():
     graph = Graph()
-    gdansk = graph.create_node(BoundingBox([0, 1, 2, 3]), GeoCoords(4, 5), "Gdansk")
+    gdansk = graph.create_node(BoundingBox([0, 1, 2, 3]), GeoCoords(4, 5), u"Gdansk")
     gdansk.add_record(GeoCoords(5, 6))
-    graph.create_node(BoundingBox([6, 7, 8, 9]), GeoCoords(10, 11), "Braniewo")
-    gdansk = graph.get_nodes_by_name("Gdansk")
-    braniewo = graph.get_nodes_by_name("Braniewo")
+    graph.create_node(BoundingBox([6, 7, 8, 9]), GeoCoords(10, 11), u"Braniewo")
+    gdansk = graph.get_nodes_by_name(u"Gdansk")
+    braniewo = graph.get_nodes_by_name(u"Braniewo")
     gdansk.push_sym_edge(braniewo, 100)
-    malbork = Node(BoundingBox([4, 3, 2, 1]), GeoCoords(12, 13), "Malbork")
+    malbork = Node(BoundingBox([4, 3, 2, 1]), GeoCoords(12, 13), u"Malbork")
     malbork.push_sym_edge(gdansk, 60)
     braniewo.push_sym_edge(malbork, 60)
     graph.add_node(malbork)
@@ -54,12 +57,12 @@ def create_real_graph(lookup_file=None):
         gc = GeoCoords(*row[1:3], reverse=True)
         lat.append(gc.lat)
         lng.append(gc.lng)
-        name = 'dupa'
+        name = u'dupa'
         try:
-            match = next(n for n in node_list if n.contains_coords(gc))
+            match = [n for n in node_list if n.contains_coords(gc).next()]
             match.add_record(gc)
             name = match.name
-            print('Found ', match.short_str(), 'in existing records')
+            print u'Found ', match.short_str(), u'in existing records'
         except StopIteration:
             try:
                 geo_json = DECODER_SINGLETON.decode(gc).raw
@@ -69,20 +72,20 @@ def create_real_graph(lookup_file=None):
                 node = graph.create_node(bb, gc, name)
                 graph.join_node(node, DECODER_SINGLETON)
                 node_list.append(node)
-                print('Decoded', name, 'successfully')
+                print u'Decoded', name, u'successfully'
             except:
-                print('Decoding', name, ': ', str(gc), 'failed')
+                print u'Decoding', name, u': ', unicode(gc), u'failed'
                 continue
         step_id = row[0]
         try:
             steps_lookup[step_id].append(name)
         except KeyError:
             steps_lookup[step_id] = [name]
-    print("Finished creating graph from data")
+    print u"Finished creating graph from data"
     if lookup_file is not None:
-        with open(lookup_file, "wb") as f:
+        with open(lookup_file, u"wb") as f:
             pickle.dump(steps_lookup, f)
-        print('Saved location lookup table')
+        print u'Saved location lookup table'
     return graph
 
 
@@ -91,7 +94,7 @@ def match_freights_make_money(graph, lookup_table_file=None):
     freights = get_freights()
     if lookup_table_file is None:
         raise NotImplementedError
-    f = open(lookup_table_file, 'rb')
+    f = open(lookup_table_file, u'rb')
     lookup_table = pickle.load(f)
     price_lookup = PriceLookup()
     for freight in freights[1:]:
@@ -113,7 +116,7 @@ def match_freights_make_money(graph, lookup_table_file=None):
         if len(freight_steps) > 0:
             try:
                 names = lookup_table[freight_id]
-                print(names)
+                print names
                 start, end = graph.get_nodes_by_name(names[0]), graph.get_nodes_by_name(names[1])
                 price_info = PriceInfo(start, end, *freight[2:5])
                 price_lookup.add_price(price_info)
@@ -125,9 +128,9 @@ def match_freights_make_money(graph, lookup_table_file=None):
                 #     except IndexError:
                 #         print('That should not have happened')
             except KeyError:
-                print('Freight id not found in the lookup table')
+                print u'Freight id not found in the lookup table'
             except IndexError:
-                print('Something is wrong with lookup table', names, 'for freight', freight_id)
+                print u'Something is wrong with lookup table', names, u'for freight', freight_id
     return price_lookup
     # filtered_steps = [s for s in freight_steps if (s[3] == '1' and s[-1] == 'load') or (s[3] == '2' and s[-1] == 'unload')]
     # print(freight_id, filtered_steps, '\n\n')
@@ -139,20 +142,20 @@ def prepare_offers(prices, offer_file):
         estimated_offers.append(estimate_offer(offer, prices))
 
     for offer in estimated_offers:
-        print(offer)
-    with open(offer_file, 'wb') as file:
+        print offer
+    with open(offer_file, u'wb') as file:
         pickle.dump(estimated_offers, file)
 
 
 
-if __name__ == "__main__":
-    lookup_table = 'lookup_table.txt'
-    price_lookup = 'prices.txt'
-    offers = 'estimated_offers.txt'
+if __name__ == u"__main__":
+    lookup_table = u'lookup_table.txt'
+    price_lookup = u'prices.txt'
+    offers = u'estimated_offers.txt'
 
     # graph = create_real_graph(lookup_table)
     # graph.save("here")
-    graph = Graph.load("here")
+    graph = Graph.load(u"here")
 
     # print(graph)
     #
@@ -186,7 +189,7 @@ if __name__ == "__main__":
 
     graph = create_malbork_graph()
 
-    offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
+    offer_list = [OfferEstimate(u'Gdansk',u'Braniewo', 0.5, 100), OfferEstimate(u'Malbork', u'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
 
     offer_evaluator = OfferEvalutaor(offer_list)
 

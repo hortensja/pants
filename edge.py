@@ -1,4 +1,4 @@
-class Edge:
+class Edge(object):
     def __init__(self, node, length, opt_reverse=None, real=False):
         self.node = node
         self.length = length
@@ -6,10 +6,10 @@ class Edge:
         self.real = real
 
     def __str__(self):
-        ret = "--- "
-        ret += str(round(self.length, 2))
-        ret += ' (real) ' if self.real else ''  # ' (appr) '
-        ret += " ---> "
+        ret = u"--- "
+        ret += unicode(round(self.length, 2))
+        ret += u' (real) ' if self.real else u''  # ' (appr) '
+        ret += u" ---> "
         ret += self.node.name
         return ret
 

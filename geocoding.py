@@ -1,14 +1,16 @@
+from __future__ import absolute_import
 from datetime import datetime
 
 # import googlemaps
 from geopy import geocoders as ggc, distance as gdst
+from itertools import imap
 
 
 def floatize(x):
-    return list(map(float, x))
+    return list(imap(float, x))
 
 
-class BoundingBox:
+class BoundingBox(object):
     def __init__(self, coords, reverse=False):
         lats = coords[0:2]
         lngs = coords[2:4]
@@ -19,17 +21,17 @@ class BoundingBox:
         self.lngs = floatize(lngs)
 
     def __str__(self):
-        return "lat: " + str(self.lats) + ", lng: " + str(self.lngs)
+        return u"lat: " + unicode(self.lats) + u", lng: " + unicode(self.lngs)
 
 
-class GeoCoords:
+class GeoCoords(object):
     def __init__(self, lat, lng, reverse=False):
         if reverse:
             lat, lng = lng, lat
         self.lat = float(lat)
         self.lng = float(lng)
 
-    def is_in_bounding_box(self, bb: BoundingBox):
+    def is_in_bounding_box(self, bb):
         lat_bounds = bb.lats
         if self.lat < lat_bounds[0] or self.lat > lat_bounds[1]:
             return False
@@ -42,24 +44,24 @@ class GeoCoords:
         return GeoCoords(self.lat + other.lat, self.lng + other.lng)
 
     def __str__(self):
-        return str(self.lat) + "," + str(self.lng)
+        return unicode(self.lat) + u"," + unicode(self.lng)
 
 
-class GeoDecoder:
+class GeoDecoder(object):
     def __init__(self):
         self.geolocator = ggc.Nominatim()
         self.gmaps = None # googlemaps.Client(key='KLUCZ_GUGLA_TY_GUPKU')
 
-    def decode(self, coords: GeoCoords):
-        location = self.geolocator.reverse(str(coords))
+    def decode(self, coords):
+        location = self.geolocator.reverse(unicode(coords))
         return location
 
     def get_driving_distance(self, city1, city2, time=datetime.now()):
         return self.gmaps.directions(city1.name, city2.name,
-                                     mode="driving",
+                                     mode=u"driving",
                                      departure_time=time)
 
-    def get_city_default(self, gc: GeoCoords):
+    def get_city_default(self, gc):
         geo_json = self.decode(gc).raw
         return GeoExtractor.extract_city(geo_json).strip()
 
@@ -70,26 +72,26 @@ class GeoDecoder:
     @staticmethod
     def get_naive_distance(gc1, gc2):
         try:
-            return gdst.distance(str(gc1), str(gc2))
+            return gdst.distance(unicode(gc1), unicode(gc2))
         except:
             return KeyError
 
 
-class GeoExtractor:
+class GeoExtractor(object):
     @staticmethod
     def extract_city(geo_json):
         try:
-            address = geo_json['address']
+            address = geo_json[u'address']
         except KeyError:
             return None
         try:
-            return address['city']
+            return address[u'city']
         except KeyError:
             try:
-                return address['town']
+                return address[u'town']
             except KeyError:
                 try:
-                    return address['village']
+                    return address[u'village']
                 except KeyError:
                     # return None
                     return address
@@ -97,15 +99,15 @@ class GeoExtractor:
     @staticmethod
     def extract_bounding_box(geo_json):
         try:
-            return geo_json['boundingbox']
+            return geo_json[u'boundingbox']
         except KeyError:
             return None
 
     @staticmethod
     def extract_distance_and_time(dist_json):
         try:
-            data = dist_json['rows']['elements']
-            return (data['distance'], data['duration'])
+            data = dist_json[u'rows'][u'elements']
+            return (data[u'distance'], data[u'duration'])
         except KeyError:
             return None
 
