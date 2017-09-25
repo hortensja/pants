@@ -106,9 +106,6 @@ if __name__ == "__main__":
 class OfferEvalutaor:
     def __init__(self, offer_list):
         self.offer_list = offer_list
-        'zesraj sie'
-        'DUPA'
-        'smierdzisz'
 
     @staticmethod
     def calculate_revenue(chosen_ones):

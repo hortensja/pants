@@ -1,6 +1,7 @@
 from datetime import datetime
 
 # import googlemaps
+import googlemaps
 from geopy import geocoders as ggc, distance as gdst
 
 
@@ -48,16 +49,22 @@ class GeoCoords:
 class GeoDecoder:
     def __init__(self):
         self.geolocator = ggc.Nominatim()
-        self.gmaps = None # googlemaps.Client(key='KLUCZ_GUGLA_TY_GUPKU')
+        self.gmaps = googlemaps.Client(key='AIzaSyCZMpHt9d-_f0LntNKZ76CwCnuuPbQiCqI')
 
     def decode(self, coords: GeoCoords):
         location = self.geolocator.reverse(str(coords))
         return location
 
-    def get_driving_distance(self, city1, city2, time=datetime.now()):
-        return self.gmaps.directions(city1.name, city2.name,
-                                     mode="driving",
-                                     departure_time=time)
+    def get_driving_distance(self, city1, city2):
+        try:
+            response = self.gmaps.distance_matrix(origins=city1.name, destinations=city2.name,
+                                     mode="driving")
+            value = response['rows'][0]['elements'][0]['distance']['value']
+            print('google OK')
+            return float(value) / 1000
+        except:
+            print('google y u no work')
+            return GeoDecoder.get_naive_distance_from_nodes(city1, city2)
 
     def get_city_default(self, gc: GeoCoords):
         geo_json = self.decode(gc).raw
@@ -65,7 +72,7 @@ class GeoDecoder:
 
     @staticmethod
     def get_naive_distance_from_nodes(city1, city2):
-        return GeoDecoder.get_naive_distance(city1.center, city2.center)
+        return GeoDecoder.get_naive_distance(city1.center, city2.center).kilometers
 
     @staticmethod
     def get_naive_distance(gc1, gc2):

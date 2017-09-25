@@ -1,0 +1,1 @@
+['Rotterdam', 'Hettstedt', 'Kêpina', 'Frechen', 'Mozzate', 'Rumilly', 'Casale Monferrato', 'Saint-Quentin-Fallavier', 'Gétigné', 'Golfech', 'Szczecin', 'Gdañsk', 'Esch-sur-Alzette', 'Ameglia', 'Osnabrück', 'Saarlouis', 'Villingen-Schwenningen', 'Bad Blankenburg', 'Neuenhagen']

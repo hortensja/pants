@@ -49,6 +49,12 @@ class Node:
         self.center = ret
         return ret
 
+    def get_edge_by_target(self, target):
+        edges = list(filter(lambda edge: edge.node == target, self.edges))
+        if len(edges) == 0:
+            return None
+        return edges[0]
+
     def contains_coords(self, gc: GeoCoords):
         return gc.is_in_bounding_box(self.bounding_box)
 

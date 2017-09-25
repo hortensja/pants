@@ -1,18 +1,18 @@
-from collections import defaultdict
-
+import json
 import pickle
 
 from geocoding import GeoDecoder
 from node import Node
 
 
-THRESHOLD_DISTANCE = 10000
-TOLERABLE_DISTANCE = 20
+THRESHOLD_DISTANCE = 250
+TOLERABLE_DISTANCE = 15
 
 class Graph:
     def __init__(self):
         self.nodes = []
         self.nodes_dict = dict()
+        self.hard_cases = dict()
 
     def create_node(self, bb, center, name, coords=None, duplicates=0):
         node = Node(bb, center, name, coords, duplicates)
@@ -21,7 +21,7 @@ class Graph:
 
     def add_node(self, node):
         if node.name in self.nodes_dict:
-            raise KeyError("Takie miasto juz istnieje")
+            raise KeyError("City "+node.name+" already exists in graph")
 
         self.nodes.append(node)
         self.nodes_dict[node.name] = node
@@ -32,7 +32,7 @@ class Graph:
     def join_node(self, node, decoder):
         for another in self.nodes:
             if another != node:
-                distance = decoder.get_naive_distance_from_nodes(node, another).kilometers
+                distance = decoder.get_naive_distance_from_nodes(node, another)
                 real = False
                 if distance > THRESHOLD_DISTANCE:
                     try:
@@ -84,6 +84,43 @@ class Graph:
             ret += str(node)
         return ret
 
+    def encode_json(self, filename='dupa.json'):
+        json_obj = {}
+        nodes_list = []
+        edges_list = []
+        for node in self.nodes:
+            print('processing ', node.name)
+            node_json = {'id': node.name, 'label': node.name, 'size': node.duplicate+1,'x': node.center.lng, 'y': node.center.lat}
+            nodes_list.append(node_json)
+            for i,edge in enumerate(node.edges):
+                edge_json = {'id': node.name + str(i), 'source': node.name, 'target': edge.node.name, 'size': edge.pheromone*10}
+                edges_list.append(edge_json)
+        json_obj['nodes'] = nodes_list
+        json_obj['edges'] = edges_list
+        with open(filename, 'w') as f:
+            json.dump(json_obj, f)
+        return json_obj
+
+    def arraify(self):
+        ret = []
+        for node in self.nodes:
+            row = []
+            for also_node in self.nodes:
+                edge = node.get_edge_by_target(also_node)
+                val = edge.length if edge is not None else 0
+                row.append(val)
+            ret.append(row)
+        return ret
+
+    def dearraify(self, pheromones):
+        for i, row in enumerate(pheromones):
+            for j, phe in enumerate(row):
+                target = self.nodes[j]
+                edge = self.nodes[i].get_edge_by_target(target)
+                if edge is not None:
+                    edge.pheromone = phe
+
+
     def match_duplicates(self, name, gc):
         try:
             alleged_match = self.get_nodes_by_name(name)
@@ -92,7 +129,16 @@ class Graph:
                 print(name, ' already exists in graph: ', alleged_match.short_str())
                 alleged_match.duplicate += 1
                 raise StopIteration
+            else:
+                try:
+                    self.hard_cases[name]
+                except KeyError:
+                    self.hard_cases[name] = []
+                cases = self.hard_cases[name]
+                name += str(len(cases))
+                self.hard_cases[name].append(name)
+                return name
         except KeyError:
-            pass
+            return name
 
 

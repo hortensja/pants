@@ -1,3 +1,4 @@
+import json
 import random
 
 import pickle
@@ -31,30 +32,32 @@ def create_malbork_graph():
     graph = Graph()
     gdansk = graph.create_node(BoundingBox([0, 1, 2, 3]), GeoCoords(4, 5), "Gdansk")
     gdansk.add_record(GeoCoords(5, 6))
-    graph.create_node(BoundingBox([6, 7, 8, 9]), GeoCoords(10, 11), "Braniewo")
+    graph.create_node(BoundingBox([6, 7, 8, 9]), GeoCoords(2, 6), "Braniewo")
     gdansk = graph.get_nodes_by_name("Gdansk")
     braniewo = graph.get_nodes_by_name("Braniewo")
     gdansk.push_sym_edge(braniewo, 100)
-    malbork = Node(BoundingBox([4, 3, 2, 1]), GeoCoords(12, 13), "Malbork")
+    malbork = Node(BoundingBox([4, 3, 2, 1]), GeoCoords(1, 1), "Malbork")
     malbork.push_sym_edge(gdansk, 60)
     braniewo.push_sym_edge(malbork, 60)
     graph.add_node(malbork)
     return graph
 
 
-def create_real_graph(lookup_file=None):
+def create_real_graph(graph_file="real_shit2", lookup_file=None, base_graph=None, base_lookup=None):
     DECODER_SINGLETON = GeoDecoder()
-    lat, lng = [], []
     # FREIGHT STEPS
     freight_steps = get_freight_steps()
-    node_list = []
-    steps_lookup = {}
-    graph = Graph()
-    for row in freight_steps:
+    steps_lookup = base_lookup if base_lookup is not None else {}
+    graph = base_graph if base_graph is not None else Graph()
+    node_list = graph.nodes
+    for i, row in enumerate(freight_steps):
+        if i%3 == 0 and i!=0:
+            graph.save(graph_file)
+            if lookup_file is not None:
+                with open(lookup_file, "wb") as f:
+                    pickle.dump(steps_lookup, f)
+            print('Autosave on iteration: ', i)
         gc = GeoCoords(*row[1:3], reverse=True)
-        lat.append(gc.lat)
-        lng.append(gc.lng)
-        name = 'dupa'
         try:
             match = next(n for n in node_list if n.contains_coords(gc))
             match.add_record(gc)
@@ -64,11 +67,10 @@ def create_real_graph(lookup_file=None):
             try:
                 geo_json = DECODER_SINGLETON.decode(gc).raw
                 name = GeoExtractor.extract_city(geo_json).strip()
-                graph.match_duplicates(name, gc)
+                name = graph.match_duplicates(name, gc)
                 bb = BoundingBox(GeoExtractor.extract_bounding_box(geo_json))
                 node = graph.create_node(bb, gc, name)
                 graph.join_node(node, DECODER_SINGLETON)
-                node_list.append(node)
                 print('Decoded', name, 'successfully')
             except:
                 print('Decoding', name, ': ', str(gc), 'failed')
@@ -79,10 +81,11 @@ def create_real_graph(lookup_file=None):
         except KeyError:
             steps_lookup[step_id] = [name]
     print("Finished creating graph from data")
+    graph.save(graph_file)
     if lookup_file is not None:
         with open(lookup_file, "wb") as f:
             pickle.dump(steps_lookup, f)
-        print('Saved location lookup table')
+        print('Autosaved location lookup table')
     return graph
 
 
@@ -150,9 +153,25 @@ if __name__ == "__main__":
     price_lookup = 'prices.txt'
     offers = 'estimated_offers.txt'
 
-    # graph = create_real_graph(lookup_table)
-    # graph.save("here")
-    graph = Graph.load("here")
+
+    graph = Graph.load("sample_graph200")
+    with open("sample_graph200_pheromones.txt", "r") as f:
+         pheromones = f.read()
+    # with open("sample_graph200_legend.txt", "w") as f:
+    #     json.dump(", ".join([node.name for node in graph.nodes]), f)
+    print([node.name for node in graph.nodes])
+    # print(graph)
+    # print('finished reading')
+    # offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
+    # offer_evaluator = OfferEvalutaor(offer_list)
+    # ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
+    # ants.run()
+    # graph.encode_json('malbork.json')
+    # with open(lookup_table, 'rb') as f:
+    #     lookup = pickle.load(f)
+    # # prices = PriceLookup.load(price_lookup, graph)
+    # graph = create_real_graph("real_shit", lookup_table, graph, lookup)
+    # graph.save("real_shit")
 
     # print(graph)
     #
@@ -160,7 +179,6 @@ if __name__ == "__main__":
     #
     # prices.save(price_lookup)
 
-    # prices = PriceLookup.load(price_lookup, graph)
     #
     # prepare_offers(prices, offers)
 
@@ -184,26 +202,22 @@ if __name__ == "__main__":
         # for offer in offers:
         #     print(offer)
 
-    graph = create_malbork_graph()
-
-    offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
-
-    offer_evaluator = OfferEvalutaor(offer_list)
-
-    ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
-
-    ants.run()
+    # graph = create_malbork_graph()
+    # offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
+    # offer_evaluator = OfferEvalutaor(offer_list)
+    # ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
+    # ants.run()
     # print(graph)
 
     # ants.print_score()
 
-    path = graph.get_path_default()
+    # path = graph.get_path_default()
 
     # for i, path_node in enumerate(path):
     #     print(i, path_node.name)
 
-    visited = set()
-    revenue_list = []
+    # visited = set()
+    # revenue_list = []
 
 
 
