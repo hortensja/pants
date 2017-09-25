@@ -56,7 +56,7 @@ class Ant:
 
 
 class ArtificialAnts(Algorithm):
-    def __init__(self, function, graph, alpha=0.9, beta=0.1, epsilon=0.1, count=100, iterations=None, seconds=None):
+    def __init__(self, function, graph, alpha=0.9, beta=0.1, epsilon=0.1, count=100, iterations=None, seconds=None, normalize = False, city_generator=range):
         super().__init__(function, iterations, seconds)
 
         self.graph = graph
@@ -69,9 +69,11 @@ class ArtificialAnts(Algorithm):
         self.beta = beta
         self.epsilon = epsilon
         self.count = count
+        self.generator = city_generator
+        self.do_normalize = normalize
 
     def one_step(self):
-        ants = list(Ant(self.graph.nodes[i % len(self.graph.nodes)]) for i in range(self.count))
+        ants = list(Ant(self.graph.nodes[i % len(self.graph.nodes)]) for i in self.generator(self.count))
         scores = []
 
         for i, ant in enumerate(ants):
@@ -90,7 +92,8 @@ class ArtificialAnts(Algorithm):
                     break
 
         self.evaporate()
-        self.normalize()
+        if self.do_normalize:
+            self.normalize()
         #print(self.graph)
         self.score(scores)
 
