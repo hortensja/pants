@@ -1,8 +1,10 @@
+from __future__ import absolute_import
 import numpy as np
 import pylab as plt
 
 from geocoding import GeoDecoder, GeoCoords
 from track import Track
+from itertools import imap
 
 NUMBER_OF_NEIGHBORS = 5
 
@@ -40,7 +42,7 @@ def gupia_function(truX, truY, X, Y):
     truY = truY.reshape(np.multiply.reduce(truY.shape))
     trutruXY = np.array((truX, truY)).T
     eror_table = []
-    for i in range(dupa):
+    for i in xrange(dupa):
         x, y = X[i], Y[i]
         xy = (x, y)
         trutruXY = sorted(trutruXY, key=lambda p: dystance(xy, p))
@@ -49,11 +51,11 @@ def gupia_function(truX, truY, X, Y):
         eror = abs(meaningless - wtf_function(x, y))
         eror_table.append(eror)
         # return 69
-    print(np.mean(eror_table))
+    print np.mean(eror_table)
     return np.array(eror_table).reshape((10, 10))
 
 
-class OfferEstimate:
+class OfferEstimate(object):
     def __init__(self, start, end, price_per_km, length=None):
         self.start = start
         self.end = end
@@ -69,20 +71,20 @@ class OfferEstimate:
         self.total = self.price_per_km * self.length
 
     def __str__(self):
-        ret = 'Offer '
+        ret = u'Offer '
         ret += self.start
-        ret += '-'
+        ret += u'-'
         ret += self.end
-        ret += ': '
-        ret += str(round(self.price_per_km, 2))
-        ret += '*'
-        ret += str(round(self.length,1))
-        ret += '='
-        ret += str(round(self.total, 2))
+        ret += u': '
+        ret += unicode(round(self.price_per_km, 2))
+        ret += u'*'
+        ret += unicode(round(self.length,1))
+        ret += u'='
+        ret += unicode(round(self.total, 2))
         return ret
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     #print("kupa")
 
     # Sample data
@@ -97,21 +99,21 @@ if __name__ == "__main__":
     # # print(Z)
     # # Plot the density map using nearest-neighbor interpolation
     #
-    fig = plt.figure(facecolor='k')
-    ax = fig.add_subplot(111, projection='3d')
+    fig = plt.figure(facecolor=u'k')
+    ax = fig.add_subplot(111, projection=u'3d')
 
     ax.plot_wireframe(X=X, Y=Y, Z=Z)
     plt.show()
 
-class OfferEvalutaor:
+class OfferEvalutaor(object):
     def __init__(self, offer_list):
         self.offer_list = offer_list
 
     @staticmethod
     def calculate_revenue(chosen_ones):
-        return sum(map(lambda x: x.total, chosen_ones))
+        return sum(imap(lambda x: x.total, chosen_ones))
 
-    def __call__(self, track: Track):
+    def __call__(self, track):
         revenue_list = []
         visited = set()
         visited.add(track.start.name)

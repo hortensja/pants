@@ -1,18 +1,20 @@
+from __future__ import absolute_import
 import uuid
 
 from edge import Edge
 from geocoding import BoundingBox, GeoCoords
+from itertools import ifilter
 
 
 
 
 
-class Node:
-    def __init__(self, bb: BoundingBox, center: GeoCoords, name=None, coords=None, duplicates=0):
+class Node(object):
+    def __init__(self, bb, center, name=None, coords=None, duplicates=0):
         if name is not None:
             self.name = name
         else:
-            self.name = str(uuid.uuid4())
+            self.name = unicode(uuid.uuid4())
         self.bounding_box = bb
         if coords is not None:
             self.records = coords
@@ -22,7 +24,7 @@ class Node:
         self.edges = set()
         self.duplicate = duplicates
 
-    def add_record(self, gc: GeoCoords):
+    def add_record(self, gc):
         self.records.append(gc)
         self.recalc_center()
 
@@ -50,18 +52,18 @@ class Node:
         return ret
 
     def get_edge_by_target(self, target):
-        edges = list(filter(lambda edge: edge.node == target, self.edges))
+        edges = list(ifilter(lambda edge: edge.node == target, self.edges))
         if len(edges) == 0:
             return None
         return edges[0]
 
-    def contains_coords(self, gc: GeoCoords):
+    def contains_coords(self, gc):
         return gc.is_in_bounding_box(self.bounding_box)
 
     def short_str(self):
-        ret = '\n'
-        ret += self.name + ' bb: [' + str(self.bounding_box) + '] center: (' + str(self.center) + ') qty: ' + str(len(self.records) + self.duplicate)
-        ret += '\n'
+        ret = u'\n'
+        ret += self.name + u' bb: [' + unicode(self.bounding_box) + u'] center: (' + unicode(self.center) + u') qty: ' + unicode(len(self.records) + self.duplicate)
+        ret += u'\n'
         return ret
 
     def __eq__(self, other):
@@ -75,7 +77,7 @@ class Node:
     def __str__(self):
         ret = self.short_str()
         for edge in self.edges:
-            ret += '\t'
-            ret += str(edge)
-            ret += '\n'
+            ret += u'\t'
+            ret += unicode(edge)
+            ret += u'\n'
         return ret

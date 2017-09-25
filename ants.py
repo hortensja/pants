@@ -1,13 +1,17 @@
+from __future__ import division
+from __future__ import absolute_import
 from random import random
 
 from alg import Algorithm
 from edge import Edge
 from track import Track
+from itertools import ifilter
+from itertools import izip
 
 
 class AntEdge(Edge):
     def __init__(self, edge):
-        super().__init__(edge.node, edge.length, edge.real)
+        super(AntEdge, self).__init__(edge.node, edge.length, edge.real)
         edge.pheromone = 1
 
     @staticmethod
@@ -16,10 +20,10 @@ class AntEdge(Edge):
         edge.__class__ = AntEdge
 
     def __str__(self):
-        return str(self.pheromone) + " ~ " + super().__str__()
+        return unicode(self.pheromone) + u" ~ " + super(AntEdge, self).__str__()
 
 
-class Ant:
+class Ant(object):
     def __init__(self, start, validate=True):
         self.track = Track(start)
         self.validate = validate
@@ -27,7 +31,7 @@ class Ant:
     def walk(self, graph):
         n = len(graph.nodes) - 1
         node = self.track.start
-        for i in range(n):
+        for i in xrange(n):
             edge = self.choose(node)
             self.track.push_edge(edge)
             node = edge.node
@@ -36,10 +40,10 @@ class Ant:
             self.track.validate(graph)
 
     def choose(self, node):
-        valid_nodes = list(filter(lambda edge: edge.node not in self.track.nodes_set, node.edges))
+        valid_nodes = list(ifilter(lambda edge: edge.node not in self.track.nodes_set, node.edges))
 
         if len(valid_nodes) == 0:
-            raise ValueError("Valid nodes exhausted")
+            raise ValueError(u"Valid nodes exhausted")
 
         num = random()
         dist = []
@@ -50,14 +54,14 @@ class Ant:
 
         num *= total
 
-        for edge, dist in zip(valid_nodes, dist):
+        for edge, dist in izip(valid_nodes, dist):
             if num < dist:
                 return edge
 
 
 class ArtificialAnts(Algorithm):
     def __init__(self, function, graph, alpha=0.9, beta=0.1, epsilon=0.1, count=100, iterations=None, seconds=None, normalize = False, city_generator=range):
-        super().__init__(function, iterations, seconds)
+        super(ArtificialAnts, self).__init__(function, iterations, seconds)
 
         self.graph = graph
 
