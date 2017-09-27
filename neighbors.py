@@ -83,6 +83,14 @@ class OfferEstimate(object):
         ret += unicode(round(self.total, 2))
         return ret
 
+    def __eq__(self, other):
+        if type(other) != type(self):
+            return False
+        return self.start == other.start and self.end == other.end and \
+               self.length == other.length and self.price_per_km == other.price_per_km
+
+    def __hash__(self):
+        return hash(self.start) + hash(self.end)
 
 if __name__ == u"__main__":
     #print("kupa")
