@@ -118,14 +118,16 @@ class OfferEvalutaor(object):
         visited = set()
         visited.add(track.start.name)
         offer_list = list(self.offer_list)
-        for edge in track.edges:
+        for i, edge in track.edges:
             city = edge.node
             visited.add(city.name)
             to_remove = []
             chosen_ones = set()
+            chosen_list = []
             for offer in offer_list:
                 if offer.start in visited and offer.end == city.name:
                     chosen_ones.add(offer)
+                    chosen_list.append(offer)
                 if offer.end in visited:
                     to_remove.append(offer)
             for bad_offer in to_remove:
@@ -134,4 +136,5 @@ class OfferEvalutaor(object):
                 # print(chosen_one)
             revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.4 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge))
         #print(max(revenue_list, key=lambda x: x[0])[0], str(track))
-        return max(revenue_list, key=lambda x: x[0])
+        best = max(revenue_list, key=lambda x: x[0])
+        return best, chosen_list[0:chosen_list.index(best[1])+1]

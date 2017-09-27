@@ -75,6 +75,9 @@ class ArtificialAnts(Algorithm):
         self.count = count
         self.generator = city_generator
         self.do_normalize = normalize
+        self.best_score = 0
+        self.best_track = None
+        self.used_offers = None
 
     def one_step(self):
         ants = list(Ant(self.graph.nodes[i % len(self.graph.nodes)]) for i in self.generator(self.count))
@@ -84,8 +87,12 @@ class ArtificialAnts(Algorithm):
             ant.walk(self.graph)
 
         for ant in ants:
-            score, endpoint = self.evaluate(ant.track)
+            score, endpoint, offers = self.evaluate(ant.track)
             #print(str(ant), score)
+            if score > self.best_score:
+                self.best_score = score
+                self.best_track = ant.track
+                self.used_offers = set(offers)
             scores.append(score)
 
             for edge in ant.track.edges:
@@ -120,5 +127,6 @@ class ArtificialAnts(Algorithm):
                 edge.pheromone *= self.alpha
                 edge.pheromone -= self.beta / len(self.graph.nodes)
                 edge.pheromone = max(self.epsilon, edge.pheromone)
+
 
 

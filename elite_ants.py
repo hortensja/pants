@@ -17,11 +17,15 @@ class EliteArtificalAnts(ArtificialAnts):
 
         max_score = 0
         for ant in ants:
-            score, endpoint = self.evaluate(ant.track)
+            score, endpoint, offers = self.evaluate(ant.track)
             ant.score = score
             ant.endpoint = endpoint
             max_score = max(score, max_score)
             # print(str(ant), score)
+            if score > self.best_score:
+                self.best_score = score
+                self.best_track = ant.track
+                self.used_offers = set(offers)
             scores.append(score)
 
         for ant in ants:
