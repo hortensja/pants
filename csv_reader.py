@@ -10,7 +10,7 @@ def get_freights():
 def get_freight_steps():
     with open('resources/kroki_frachtow.csv') as freight_steps:
         step_reader = csv.reader(freight_steps)
-        return list(step_reader)[1000:1020]
+        return list(step_reader)[1:2000]
 
 
 def get_offers():

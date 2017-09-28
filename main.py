@@ -49,14 +49,15 @@ def create_real_graph(graph_file="real_shit2", lookup_file=None, base_graph=None
     freight_steps = get_freight_steps()
     steps_lookup = base_lookup if base_lookup is not None else {}
     graph = base_graph if base_graph is not None else Graph()
-    node_list = graph.nodes
+    # node_list = graph.nodes
+    node_list = []
     for i, row in enumerate(freight_steps):
-        if i%3 == 0 and i!=0:
-            graph.save(graph_file)
-            if lookup_file is not None:
-                with open(lookup_file, "wb") as f:
-                    pickle.dump(steps_lookup, f)
-            print('Autosave on iteration: ', i)
+        # if i%3 == 0 and i!=0:
+        #     graph.save(graph_file)
+        #     if lookup_file is not None:
+        #         with open(lookup_file, "wb") as f:
+        #             pickle.dump(steps_lookup, f)
+        #     print('Autosave on iteration: ', i)
         gc = GeoCoords(*row[1:3], reverse=True)
         try:
             match = next(n for n in node_list if n.contains_coords(gc))
@@ -70,7 +71,7 @@ def create_real_graph(graph_file="real_shit2", lookup_file=None, base_graph=None
                 name = graph.match_duplicates(name, gc)
                 bb = BoundingBox(GeoExtractor.extract_bounding_box(geo_json))
                 node = graph.create_node(bb, gc, name)
-                graph.join_node(node, DECODER_SINGLETON)
+                # graph.join_node(node, DECODER_SINGLETON)
                 print('Decoded', name, 'successfully')
             except:
                 print('Decoding', name, ': ', str(gc), 'failed')
@@ -80,7 +81,7 @@ def create_real_graph(graph_file="real_shit2", lookup_file=None, base_graph=None
             steps_lookup[step_id].append(name)
         except KeyError:
             steps_lookup[step_id] = [name]
-    print("Finished creating graph from data")
+    # print("Finished creating graph from data")
     graph.save(graph_file)
     if lookup_file is not None:
         with open(lookup_file, "wb") as f:
@@ -131,6 +132,7 @@ def match_freights_make_money(graph, lookup_table_file=None):
                 print('Freight id not found in the lookup table')
             except IndexError:
                 print('Something is wrong with lookup table', names, 'for freight', freight_id)
+    f.close()
     return price_lookup
     # filtered_steps = [s for s in freight_steps if (s[3] == '1' and s[-1] == 'load') or (s[3] == '2' and s[-1] == 'unload')]
     # print(freight_id, filtered_steps, '\n\n')
@@ -138,28 +140,24 @@ def match_freights_make_money(graph, lookup_table_file=None):
 def prepare_offers(prices, offer_file):
     offers = get_offers()
     estimated_offers = []
-    for offer in offers[1:]:
+    for offer in offers:
         estimated_offers.append(estimate_offer(offer, prices))
 
-    for offer in estimated_offers:
-        print(offer)
+    # for offer in estimated_offers:
+    #     print(offer)
     with open(offer_file, 'wb') as file:
         pickle.dump(estimated_offers, file)
 
 
 
 if __name__ == "__main__":
-    lookup_table = 'lookup_table.txt'
-    price_lookup = 'prices.txt'
-    offers = 'estimated_offers.txt'
 
 
-    graph = Graph.load("sample_graph200")
-    with open("sample_graph200_pheromones.txt", "r") as f:
-         pheromones = f.read()
+    # with open("sample_graph200_pheromones.txt", "r") as f:
+    #      pheromones = f.read()
     # with open("sample_graph200_legend.txt", "w") as f:
     #     json.dump(", ".join([node.name for node in graph.nodes]), f)
-    print([node.name for node in graph.nodes])
+    # print([node.name for node in graph.nodes])
     # print(graph)
     # print('finished reading')
     # offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
@@ -175,12 +173,19 @@ if __name__ == "__main__":
 
     # print(graph)
     #
+    lookup_table = 'lookup_table.txt'
+    price_lookup = 'prices.txt'
+    offers = 'estimated_offers.txt'
+
+    graph = Graph.load("dupa")#create_real_graph("dupa", lookup_table)
+    # with open(lookup_table, 'rb') as f:
+    #     lookup = pickle.load(f)
     # prices = match_freights_make_money(graph, lookup_table)
     #
-    # prices.save(price_lookup)
+    prices = PriceLookup.load("new_prices.txt", graph)#.save("new_prices.txt")
 
     #
-    # prepare_offers(prices, offers)
+    prepare_offers(prices, "offers_experimental.txt")
 
 
     # with open(offers, 'rb') as file:
