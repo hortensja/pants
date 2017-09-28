@@ -3,8 +3,8 @@ from __future__ import absolute_import
 from datetime import datetime
 
 # import googlemaps
-import googlemaps
-from geopy import geocoders as ggc, distance as gdst
+# import googlemaps
+# from geopy import geocoders as ggc, distance as gdst
 from itertools import imap
 
 

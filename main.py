@@ -13,8 +13,8 @@ from graph import Graph
 from neighbors import estimate_offer, OfferEstimate, OfferEvalutaor
 from node import Node
 
-from matplotlib import *
-from matplotlib.pyplot import *
+# from matplotlib import *
+# from matplotlib.pyplot import *
 
 from prices import PriceInfo, PriceLookup
 from io import open
@@ -157,18 +157,19 @@ if __name__ == u"__main__":
     offers = u'estimated_offers.txt'
 
 
-    graph = Graph.load(u"sample_graph200")
-    with open(u"sample_graph200_pheromones.txt", u"r") as f:
-         pheromones = f.read()
+    # graph = Graph.load(u"sample_graph200")
+    # with open(u"sample_graph200_pheromones.txt", u"r") as f:
+    #      pheromones = f.read()
     # with open("sample_graph200_legend.txt", "w") as f:
     #     json.dump(", ".join([node.name for node in graph.nodes]), f)
-    print [node.name for node in graph.nodes]
+    # print [node.name for node in graph.nodes]
     # print(graph)
     # print('finished reading')
-    # offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
-    # offer_evaluator = OfferEvalutaor(offer_list)
-    # ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
-    # ants.run()
+    graph = create_malbork_graph()
+    offer_list = [OfferEstimate('Gdansk','Braniewo', 0.5, 100), OfferEstimate('Malbork', 'Braniewo', 0.2, 60)] #, OfferEstimate('Braniewo', 'Gdansk', 1.0, 1000)]
+    offer_evaluator = OfferEvalutaor(offer_list)
+    ants = ArtificialAnts(offer_evaluator, graph, alpha=0.6, beta=0.8, epsilon=0.01, iterations=10)
+    ants.run()
     # graph.encode_json('malbork.json')
     # with open(lookup_table, 'rb') as f:
     #     lookup = pickle.load(f)

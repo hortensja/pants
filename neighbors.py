@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-import numpy as np
-import pylab as plt
+# import numpy as np
+# import pylab as plt
 
 from geocoding import GeoDecoder, GeoCoords
 from track import Track
@@ -126,12 +126,12 @@ class OfferEvalutaor(object):
         visited = set()
         visited.add(track.start.name)
         offer_list = list(self.offer_list)
-        for i, edge in track.edges:
+        chosen_list = []
+        for edge in track.edges:
             city = edge.node
             visited.add(city.name)
             to_remove = []
             chosen_ones = set()
-            chosen_list = []
             for offer in offer_list:
                 if offer.start in visited and offer.end == city.name:
                     chosen_ones.add(offer)
@@ -142,7 +142,13 @@ class OfferEvalutaor(object):
                 offer_list.remove(bad_offer)
             # for chosen_one in chosen_ones:
                 # print(chosen_one)
-            revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.4 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge))
+            revenue_list.append((OfferEvalutaor.calculate_revenue(chosen_ones) - edge.length*0.4 + (revenue_list[-1][0] if len(revenue_list) > 0 else 0), edge, chosen_list[-1] if len(chosen_list) > 0 else 'dupa'))
         #print(max(revenue_list, key=lambda x: x[0])[0], str(track))
         best = max(revenue_list, key=lambda x: x[0])
-        return best, chosen_list[0:chosen_list.index(best[1])+1]
+        print(best)
+        print(chosen_list)
+        try:
+            best_index = chosen_list.index(best[2])
+        except ValueError:
+            best_index = 0
+        return best[0], best[1], chosen_list[0:best_index+1]
